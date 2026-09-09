@@ -52,6 +52,19 @@
                     <release>${java.version}</release>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.github.ferstl</groupId>
+                <artifactId>depgraph-maven-plugin</artifactId>
+                <version>4.0.3</version>
+                <configuration>
+                    <createImage>true</createImage>
+                    <reduceEdges>false</reduceEdges>
+                    <scope>compile</scope>
+                    <includes>
+                        <include>mptc.gov.kh.koklim*:*</include>
+                    </includes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

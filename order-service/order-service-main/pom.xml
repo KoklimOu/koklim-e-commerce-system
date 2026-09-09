@@ -18,4 +18,32 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>mptc.gov.kh.koklim</groupId>
+            <artifactId>order-service-restapi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mptc.gov.kh.koklim</groupId>
+            <artifactId>order-service-persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mptc.gov.kh.koklim</groupId>
+            <artifactId>order-service-messaging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mptc.gov.kh.koklim</groupId>
+            <artifactId>order-domain-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mptc.gov.kh.koklim</groupId>
+            <artifactId>order-application-service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 </project>
