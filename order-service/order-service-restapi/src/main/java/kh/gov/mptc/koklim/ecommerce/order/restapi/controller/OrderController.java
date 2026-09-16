@@ -1,6 +1,7 @@
 package kh.gov.mptc.koklim.ecommerce.order.restapi.controller;
 
 
+import jakarta.validation.Valid;
 import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.OrderCreateRequest;
 import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.OrderCreateResponse;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import java.util.UUID;
 public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderCreateResponse createOrder(@RequestBody OrderCreateRequest orderCreateRequest) {
+    public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest orderCreateRequest) {
         return OrderCreateResponse.builder().orderId(UUID.randomUUID()).build();
     }
 }
