@@ -8,7 +8,7 @@
         <version>4.1.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>kh.mptc.gov.ecommerce.koklim</groupId>
+    <groupId>kh.gov.mptc.koklim.ecommerce</groupId>
     <artifactId>e-commerce-system</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <!--  Build subZmodules - JAR files  -->
@@ -26,17 +26,17 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>kh.mptc.gov.ecommerce.koklim</groupId>
+                <groupId>kh.gov.mptc.koklim.ecommerce</groupId>
                 <artifactId>common-domain</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>kh.mptc.gov.ecommerce.koklim</groupId>
+                <groupId>kh.gov.mptc.koklim.ecommerce</groupId>
                 <artifactId>order-domain-core</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>kh.mptc.gov.ecommerce.koklim</groupId>
+                <groupId>kh.gov.mptc.koklim.ecommerce</groupId>
                 <artifactId>common-restapi</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
@@ -79,7 +79,7 @@
                     <reduceEdges>false</reduceEdges>
                     <scope>compile</scope>
                     <includes>
-                        <include>mptc.gov.kh.koklim*:*</include>
+                        <include>kh.gov.mptc.koklim.ecommerce*:*</include>
                     </includes>
                 </configuration>
             </plugin>
