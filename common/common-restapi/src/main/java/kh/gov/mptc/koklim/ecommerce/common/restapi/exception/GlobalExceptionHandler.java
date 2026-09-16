@@ -16,8 +16,8 @@ public class GlobalExceptionHandler {
     public RestApiErrorResponse<?> handleException(MethodArgumentNotValidException e) {
         return RestApiErrorResponse.builder()
                 .code(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message(e.getMessage())
-                .details(e.getBindingResult().getFieldErrors())
+                .message("Data validation failed!")
+                .details(extractFieldErrors(e.getFieldErrors()))
                 .build();
     }
 

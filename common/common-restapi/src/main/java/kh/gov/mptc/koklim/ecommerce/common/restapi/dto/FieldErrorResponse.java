@@ -4,7 +4,7 @@ import lombok.Builder;
 
 public record FieldErrorResponse(
         String field,
-        String message,
+        String reason,
         String code
 ) {
 }
