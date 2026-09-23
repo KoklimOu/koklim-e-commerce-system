@@ -24,11 +24,10 @@ public class OrderCommandController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateOrderResponse createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
-        createOrderUseCase.execute(
+        CreateOrderResult createOrderResult = createOrderUseCase.execute(
                 orderWebMapper.toCreateOrderCommand(createOrderRequest)
         );
 
-        CreateOrderResult createOrderResult = new CreateOrderResult(UUID.randomUUID());
         return orderWebMapper.toCreateOrderResponse(createOrderResult);
     }
 }
