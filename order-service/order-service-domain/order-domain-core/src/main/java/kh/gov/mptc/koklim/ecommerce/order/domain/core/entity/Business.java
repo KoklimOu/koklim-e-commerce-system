@@ -31,6 +31,11 @@ public class Business extends AggregateRoot<BusinessId> {
         status = builder.status;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+
     public static final class Builder {
         private BusinessId id;
         private List<Product> products;
@@ -39,9 +44,6 @@ public class Business extends AggregateRoot<BusinessId> {
         private Builder() {
         }
 
-        public static Builder builder() {
-            return new Builder();
-        }
 
         public Builder id(BusinessId val) {
             id = val;
