@@ -10,9 +10,13 @@ spring:
     password: mypassword
     url: jdbc:postgresql://localhost:8432/db_order
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+  sql:
+    init:
+      mode: always

@@ -186,7 +186,7 @@ public class Order extends AggregateRoot<OrderId> {
 
     //  UTILS FUNCTIONALITY
     private void validateItemPrice(OrderItem orderItem) {
-        if (orderItem.isPriceValid()){
+        if (!orderItem.isPriceValid()) {
             throw new OrderDomainException("Order item price is not valid");
         }
     }
@@ -238,7 +238,7 @@ public class Order extends AggregateRoot<OrderId> {
         updateFailureMessages(failureMessages);
     }
 
-    public void cancel(){
+    public void cancel(List<String> failureMessages){
         if (!(orderStatus == OrderStatus.CANCELLING || orderStatus == OrderStatus.PENDING)) {
             throw new OrderDomainException("Order is not in correct state for cancel operation");
         }

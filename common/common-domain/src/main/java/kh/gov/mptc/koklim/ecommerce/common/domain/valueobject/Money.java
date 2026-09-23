@@ -6,6 +6,14 @@ import java.math.RoundingMode;
 // why using BigDecimal?
 public record Money(BigDecimal amount) {
     public static final Money ZERO = new Money(BigDecimal.ZERO);
+
+    // record equals() uses BigDecimal.equals(), which is scale-sensitive (25 != 25.00), so always store 2 decimals
+    public Money {
+        if (amount != null) {
+            amount = amount.setScale(2, RoundingMode.HALF_EVEN);
+        }
+    }
+
     public boolean isPositive() {
         return amount.compareTo(BigDecimal.ZERO) > 0;
     };

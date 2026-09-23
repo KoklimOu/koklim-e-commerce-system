@@ -6,6 +6,7 @@ import kh.gov.mptc.koklim.ecommerce.order.persistence.entity.CustomerEntity;
 
 import java.util.UUID;
 
+@org.mapstruct.Mapper(componentModel = "spring")
 public interface CustomerPersistenceMapper {
     Customer customerEntityToCustomer(CustomerEntity customerEntity);
 

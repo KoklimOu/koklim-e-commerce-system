@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    // no @GeneratedValue: the domain assigns the id in Order.initializeOrder()
     private UUID id;
     private String customerId;
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
