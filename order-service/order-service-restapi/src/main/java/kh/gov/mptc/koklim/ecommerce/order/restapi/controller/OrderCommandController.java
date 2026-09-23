@@ -3,7 +3,7 @@ package kh.gov.mptc.koklim.ecommerce.order.restapi.controller;
 
 import jakarta.validation.Valid;
 import kh.gov.mptc.koklim.ecommerce.order.application.dto.CreateOrderResult;
-import kh.gov.mptc.koklim.ecommerce.order.application.usecase.CreateOrderUseCase;
+import kh.gov.mptc.koklim.ecommerce.order.application.port.input.CreateOrderPort;
 import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.CreateOrderRequest;
 import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.CreateOrderResponse;
 import kh.gov.mptc.koklim.ecommerce.order.restapi.mapper.OrderWebMapper;
@@ -18,13 +18,13 @@ import java.util.UUID;
 @RequiredArgsConstructor //auto inject constructor
 public class OrderCommandController {
 
-    private final CreateOrderUseCase createOrderUseCase;
+    private final CreateOrderPort createOrderPort;
     private final OrderWebMapper orderWebMapper;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateOrderResponse createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
-        CreateOrderResult createOrderResult = createOrderUseCase.execute(
+        CreateOrderResult createOrderResult = createOrderPort.execute(
                 orderWebMapper.toCreateOrderCommand(createOrderRequest)
         );
 
