@@ -1,8 +1,8 @@
 package kh.gov.mptc.koklim.ecommerce.order.application.port.output;
 
 import kh.gov.mptc.koklim.ecommerce.order.domain.core.entity.Order;
-import kh.gov.mptc.koklim.ecommerce.order.application.dto.CreateOrderResponse;
+import kh.gov.mptc.koklim.ecommerce.order.application.dto.CreateOrderResult;
 
 public interface OrderRepository {
-    CreateOrderResponse saveOrder(Order order);
+    CreateOrderResult saveOrder(Order order);
 }
