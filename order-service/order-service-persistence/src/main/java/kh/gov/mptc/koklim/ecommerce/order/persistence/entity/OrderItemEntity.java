@@ -15,8 +15,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderItemEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //auto increment
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private UUID productId;
 
