@@ -4,10 +4,13 @@ import kh.gov.mptc.koklim.ecommerce.order.domain.core.entity.Order;
 import kh.gov.mptc.koklim.ecommerce.order.domain.core.entity.OrderItem;
 import kh.gov.mptc.koklim.ecommerce.order.persistence.entity.OrderEntity;
 import kh.gov.mptc.koklim.ecommerce.order.persistence.entity.OrderItemEntity;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,9 +25,20 @@ public interface OrderPersistenceMapper {
     @Mapping(source = "failureMessages", target = "failureMessages", qualifiedByName = "mapFailureMessages")
     OrderEntity orderToOrderEntity(Order order);
 
+    // Address and items own the order_id foreign key, so each child must point back at its order
+    @AfterMapping
+    default void linkChildrenToOrder(@MappingTarget OrderEntity orderEntity) {
+        if (orderEntity.getDeliveryAddress() != null) {
+            orderEntity.getDeliveryAddress().setOrder(orderEntity);
+        }
+        if (orderEntity.getItems() != null) {
+            orderEntity.getItems().forEach(item -> item.setOrder(orderEntity));
+        }
+    }
+
     @Named("mapFailureMessages")
     default String mapFailureMessages(List<String> failureMessages) {
-        return String.join(",", failureMessages);
+        return failureMessages == null ? null : String.join(",", failureMessages);
     }
 
 
@@ -52,6 +66,6 @@ public interface OrderPersistenceMapper {
 
     @Named("mapFailureMessagesToList")
     default List<String> mapFailureMessagesToList(String failureMessages) {
-        return Arrays.stream(failureMessages.split(",")).toList();
+        return failureMessages == null ? new ArrayList<>() : Arrays.stream(failureMessages.split(",")).toList();
     }
 }

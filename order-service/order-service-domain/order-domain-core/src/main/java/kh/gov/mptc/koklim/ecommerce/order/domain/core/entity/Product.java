@@ -16,6 +16,12 @@ public class Product extends BaseEntity<ProductId> {
         return price;
     }
 
+    // The request only carries the product id; name and price come from the business catalog
+    public void updateWithConfirmedNameAndPrice(String name, Money price) {
+        this.name = name;
+        this.price = price;
+    }
+
     private Product(Builder builder) {
         super.setId(builder.id);
         name = builder.name;

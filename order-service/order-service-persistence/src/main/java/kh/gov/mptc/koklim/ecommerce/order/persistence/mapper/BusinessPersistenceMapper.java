@@ -23,7 +23,7 @@ public interface BusinessPersistenceMapper {
         BusinessEntity first = businessEntities.getFirst();
         return Business.builder()
                 .id(new BusinessId(first.getBusinessId()))
-                .status(Boolean.TRUE.equals(first.getBusinessActive()))
+                .active(Boolean.TRUE.equals(first.getBusinessActive()))
                 .products(businessEntitiesToProducts(businessEntities))
                 .build();
     }
