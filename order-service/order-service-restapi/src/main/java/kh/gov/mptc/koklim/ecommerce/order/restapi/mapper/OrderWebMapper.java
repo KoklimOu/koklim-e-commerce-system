@@ -9,6 +9,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface OrderWebMapper {
     //Source = OrderCreateRequest, Target = CreateOrderCommand
-    CreateOrderCommand សំណើបង្កើតការបញ្ជាទិញទៅកាន់ពាក្យបញ្ជាបង្កើតការបញ្ជាទិញ(OrderCreateRequest orderCreateRequest);
-    OrderCreateResponse បំប្លែងលទ្ធផលនៃការបង្កើតការបញ្ជាទិញទៅជាការឆ្លើយតបនៃការបង្កើតការបញ្ជាទិញ(CreateOrderResult createOrderResult);
+    CreateOrderCommand orderCreateRequestToCreateOrderCommand(OrderCreateRequest orderCreateRequest);
+    OrderCreateResponse createOrderResultToOrderCreateResponse(CreateOrderResult createOrderResult);
 }

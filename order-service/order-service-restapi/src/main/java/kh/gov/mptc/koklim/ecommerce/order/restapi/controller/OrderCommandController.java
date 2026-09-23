@@ -25,10 +25,10 @@ public class OrderCommandController {
     @ResponseStatus(HttpStatus.CREATED)
     public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest orderCreateRequest) {
         createOrderUseCase.execute(
-                orderWebMapper.សំណើបង្កើតការបញ្ជាទិញទៅកាន់ពាក្យបញ្ជាបង្កើតការបញ្ជាទិញ(orderCreateRequest)
+                orderWebMapper.orderCreateRequestToCreateOrderCommand(orderCreateRequest)
         );
 
         CreateOrderResult createOrderResult = new CreateOrderResult(UUID.randomUUID());
-        return orderWebMapper.បំប្លែងលទ្ធផលនៃការបង្កើតការបញ្ជាទិញទៅជាការឆ្លើយតបនៃការបង្កើតការបញ្ជាទិញ(createOrderResult);
+        return orderWebMapper.createOrderResultToOrderCreateResponse(createOrderResult);
     }
 }
