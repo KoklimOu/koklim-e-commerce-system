@@ -4,8 +4,8 @@ package kh.gov.mptc.koklim.ecommerce.order.restapi.controller;
 import jakarta.validation.Valid;
 import kh.gov.mptc.koklim.ecommerce.order.application.dto.CreateOrderResult;
 import kh.gov.mptc.koklim.ecommerce.order.application.usecase.CreateOrderUseCase;
-import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.OrderCreateRequest;
-import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.OrderCreateResponse;
+import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.CreateOrderRequest;
+import kh.gov.mptc.koklim.ecommerce.order.restapi.dto.CreateOrderResponse;
 import kh.gov.mptc.koklim.ecommerce.order.restapi.mapper.OrderWebMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,12 +23,12 @@ public class OrderCommandController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest orderCreateRequest) {
+    public CreateOrderResponse createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
         createOrderUseCase.execute(
-                orderWebMapper.orderCreateRequestToCreateOrderCommand(orderCreateRequest)
+                orderWebMapper.toCreateOrderCommand(createOrderRequest)
         );
 
         CreateOrderResult createOrderResult = new CreateOrderResult(UUID.randomUUID());
-        return orderWebMapper.createOrderResultToOrderCreateResponse(createOrderResult);
+        return orderWebMapper.toCreateOrderResponse(createOrderResult);
     }
 }
