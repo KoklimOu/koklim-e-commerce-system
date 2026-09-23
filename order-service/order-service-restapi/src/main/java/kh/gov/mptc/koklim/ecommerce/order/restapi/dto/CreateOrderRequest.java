@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record OrderCreateRequest(
+public record CreateOrderRequest(
         @NotNull
         UUID customerId,
         @NotNull
