@@ -1,6 +1,8 @@
 package kh.gov.mptc.koklim.ecommerce.order.persistence.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import kh.gov.mptc.koklim.ecommerce.common.domain.valueobject.OrderStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,7 +33,9 @@ public class OrderEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItemEntity> items;
 
-    //why not final, because not updatable later
     private UUID trackingId;
     private String failureMessages;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 }
