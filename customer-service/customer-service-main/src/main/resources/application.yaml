@@ -6,6 +6,15 @@ server:
 spring:
   application:
     name: customer-service
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        namespace: ${spring.profiles.active}
+      username: nacos
+      password: nacos
+      server-addr: 127.0.0.1:8848
   datasource:
     driver-class-name: org.postgresql.Driver
     username: ecommerce_user

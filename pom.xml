@@ -20,6 +20,7 @@
         <module>order-service</module>
         <module>customer-service</module>
         <module>payment-service</module>
+        <module>business-service</module>
     </modules>
     <properties>
         <java.version>25</java.version>
