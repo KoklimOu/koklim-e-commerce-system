@@ -5,9 +5,15 @@ spring:
   application:
     name: order-service
   profiles:
-    active: dev
+    active: prod
+  config:
+    import:
+      - nacos:${spring.application.name}.${spring.cloud.nacos.config.file-extension}
   cloud:
     nacos:
+      config:
+        file-extension: yaml
+        namespace: ${spring.profiles.active}
       discovery:
         namespace: ${spring.profiles.active}
       username: nacos
