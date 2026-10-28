@@ -22,6 +22,7 @@
         <module>payment-service</module>
         <module>business-service</module>
         <module>gateway-service</module>
+        <module>user-service</module>
     </modules>
     <properties>
         <java.version>25</java.version>

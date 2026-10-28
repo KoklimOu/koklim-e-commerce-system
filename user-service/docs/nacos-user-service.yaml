@@ -1,0 +1,9 @@
+# Optional. In the Nacos console create:
+#   Namespace: dev   |   Data ID: user-service.yaml   |   Group: DEFAULT_GROUP   |   Format: YAML
+# Values here override application.yaml, so you can change them without rebuilding the service.
+# Keep the admin client secret in the KEYCLOAK_ADMIN_CLIENT_SECRET environment variable, not here.
+keycloak:
+  admin:
+    server-url: http://localhost:8180
+    realm: ecommerce
+    client-id: ecommerce-admin-client

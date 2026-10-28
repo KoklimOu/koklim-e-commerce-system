@@ -3,6 +3,7 @@ package kh.gov.mptc.koklim.ecommerce.common.restapi.exception;
 import kh.gov.mptc.koklim.ecommerce.common.restapi.dto.FieldErrorResponse;
 import kh.gov.mptc.koklim.ecommerce.common.restapi.dto.RestApiErrorResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +20,14 @@ public class GlobalExceptionHandler {
                 .message("Data validation failed!")
                 .details(extractFieldErrors(e.getFieldErrors()))
                 .build();
+    }
+
+    @ExceptionHandler(GlobalException.class)
+    public ResponseEntity<RestApiErrorResponse<?>> handleGlobalException(GlobalException e) {
+        return ResponseEntity.status(e.getStatus()).body(RestApiErrorResponse.builder()
+                .code(e.getStatus().getReasonPhrase())
+                .message(e.getMessage())
+                .build());
     }
 
     private List<FieldErrorResponse> extractFieldErrors

@@ -1,0 +1,58 @@
+server:
+  port: 0   # random port; the gateway finds this service through Nacos (lb://user-service)
+
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: dev
+  config:
+    import:
+      # optional: the service still starts if there is no user-service.yaml in Nacos yet
+      - optional:nacos:${spring.application.name}.${spring.cloud.nacos.config.file-extension}
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        namespace: ${spring.profiles.active}
+      discovery:
+        namespace: ${spring.profiles.active}
+      username: nacos
+      password: nacos
+      server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:8432/db_user}
+    username: ${DB_USERNAME:ecommerce_user}
+    password: ${DB_PASSWORD:mypassword}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Same Keycloak realm as the gateway. Resolved lazily, so the service starts even if Keycloak is down.
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:8180/realms/ecommerce}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update   # dev only; we switch to Flyway in the Data module
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Keycloak admin client: a service-account client with realm-management roles (see docs/keycloak-notes.md)
+keycloak:
+  admin:
+    server-url: ${KEYCLOAK_URL:http://localhost:8180}
+    realm: ecommerce
+    client-id: user-service-admin
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:}   # never commit the real secret
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
