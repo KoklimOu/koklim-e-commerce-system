@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
@@ -31,6 +33,27 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserResponse getById(@PathVariable String id) {
-        return userService.getById(id);
+        return userService.getUserById(id);
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        userService.delete(id);
+    }
+
+    @GetMapping
+    public List<UserResponse> getUsers() {
+        return userService.getUsers();
+    }
+
+    @GetMapping("/username/{username}")
+    public UserResponse getByUsername(@PathVariable String username) {
+        return userService.getUserByUsername(username);
+    }
+
+    @GetMapping("/role/{roleName}")
+    public List<UserResponse> getByRoleName(@PathVariable String roleName) {
+        return userService.getUsersByRoleName(roleName);
+    }
+
 }
