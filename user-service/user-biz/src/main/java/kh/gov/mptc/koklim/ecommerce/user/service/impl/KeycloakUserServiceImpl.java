@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -83,5 +85,26 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
             log.error("Could not get Keycloak user {}", id, e);
         }
         return null;
+    }
+
+    @Override
+    public List<UserRepresentation> getKeycloakUsers() {
+        return keycloak.realm(realm).users().list();
+    }
+
+    @Override
+    public void deleteKeycloakUser(String keycloakUserId) {
+        try (Response response = keycloak.realm(realm).users().delete(keycloakUserId)) {
+            if (response.getStatus() != HttpStatus.NO_CONTENT.value()) {
+                log.error("Cannot delete user {} in Keycloak, status {}", keycloakUserId, response.getStatus());
+                throw new KeycloakException(
+                        HttpStatus.valueOf(response.getStatus()),
+                        "Delete user in keycloak failed with status " + response.getStatus());
+            }
+        } catch (ProcessingException | WebApplicationException e) {
+            log.error("Keycloak admin client failed", e);
+            throw new KeycloakException(HttpStatus.BAD_GATEWAY,
+                    "Cannot reach Keycloak (" + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
+        }
     }
 }

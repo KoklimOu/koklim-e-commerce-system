@@ -1,6 +1,5 @@
 package kh.gov.mptc.koklim.ecommerce.user.service.impl;
 
-import kh.gov.mptc.koklim.ecommerce.user.config.KeycloakAdminClientConfig;
 import kh.gov.mptc.koklim.ecommerce.user.dto.UserCreateRequest;
 import kh.gov.mptc.koklim.ecommerce.user.dto.UserResponse;
 import kh.gov.mptc.koklim.ecommerce.user.dto.UserUpdateRequest;
@@ -13,7 +12,6 @@ import kh.gov.mptc.koklim.ecommerce.user.repository.UserRepository;
 import kh.gov.mptc.koklim.ecommerce.user.service.KeycloakRoleService;
 import kh.gov.mptc.koklim.ecommerce.user.service.KeycloakUserService;
 import kh.gov.mptc.koklim.ecommerce.user.service.UserService;
-import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,31 +32,26 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final KeycloakUserService keycloakUserService;
     private final KeycloakRoleService keycloakRoleService;
-    private final Keycloak keycloak;
 
     @Override
     public UserResponse create(UserCreateRequest userCreateRequest) {
 
-        // Validate username
         if (userRepository.existsByUsername(userCreateRequest.username())) {
             throw new UsernameConflictException(HttpStatus.CONFLICT,
                     "Username already exists");
         }
 
-        // Validate password
         if (!userCreateRequest.password().equals(userCreateRequest.confirmedPassword())) {
             throw new PasswordMismatchException(HttpStatus.BAD_REQUEST,
                     "Password does not match");
         }
 
-        // 1) Save the user into Keycloak (identity, password)
         keycloakUserService.createKeycloakUser(toKeycloakUser(userCreateRequest));
         String keycloakUserId = keycloakUserService
                 .getKeycloakUserByUsername(userCreateRequest.username()).getId();
 
         keycloakRoleService.assignRole(keycloakUserId, userCreateRequest.roleId());
 
-        // 2) Then save the profile into our DB, using the Keycloak id
         try {
             UserEntity userEntity = userMapper.toEntity(userCreateRequest);
             userEntity.setId(keycloakUserId);
@@ -71,24 +66,30 @@ public class UserServiceImpl implements UserService {
                     userEntity.getMobilePhone(),
                     userEntity.getAddress());
         } catch (RuntimeException e) {
-            // Do not leave a Keycloak user without a profile: a retry would be blocked by "already exists"
             keycloakUserService.deleteKeycloakUserQuietly(keycloakUserId);
             throw e;
         }
     }
 
+    @Override
+    public List<UserResponse> getUsersByRoleName(String roleName) {
+        List<UserRepresentation> members = keycloakRoleService.getUsersByRoleName(roleName);
+        List<String> ids = members.stream().map(UserRepresentation::getId).toList();
+        return toResponses(userRepository.findAllById(ids), members);
+    }
 
-    private UserRepresentation toKeycloakUser(UserCreateRequest userCreateRequest) {
-        UserRepresentation userRepresentation = userMapper.toRepresentation(userCreateRequest);
-        userRepresentation.setEnabled(true);
-        userRepresentation.setEmailVerified(false);
+    @Override
+    public List<UserResponse> getUsers() {
+        return toResponses(userRepository.findAll(), keycloakUserService.getKeycloakUsers());
+    }
 
-        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
-        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
-        credentialRepresentation.setValue(userCreateRequest.password());
-        credentialRepresentation.setTemporary(false);
-        userRepresentation.setCredentials(List.of(credentialRepresentation));
-        return userRepresentation;
+    @Override
+    public UserResponse getUserByUsername(String username) {
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() ->
+                new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found")
+        );
+        return userMapper.toResponse(
+                userEntity, keycloakUserService.getKeycloakUserById(userEntity.getId()));
     }
 
     @Override
@@ -117,11 +118,51 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getById(String id) {
+    public void delete(String id) {
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() ->
+                new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found")
+        );
+
+        // 1) Delete from Keycloak first: if it fails, the user keeps both login and profile
+        keycloakUserService.deleteKeycloakUser(id);
+
+        // 2) Then delete the profile from our DB
+        userRepository.delete(userEntity);
+    }
+
+    @Override
+    public UserResponse getUserById(String id) {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() ->
                 new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found")
         );
         return userMapper.toResponse(
                 userEntity, keycloakUserService.getKeycloakUserById(id));
     }
+
+
+    //  HELPS METHODS
+
+    private UserRepresentation toKeycloakUser(UserCreateRequest userCreateRequest) {
+        UserRepresentation userRepresentation = userMapper.toRepresentation(userCreateRequest);
+        userRepresentation.setEnabled(true);
+        userRepresentation.setEmailVerified(false);
+
+        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
+        credentialRepresentation.setValue(userCreateRequest.password());
+        credentialRepresentation.setTemporary(false);
+        userRepresentation.setCredentials(List.of(credentialRepresentation));
+        return userRepresentation;
+    }
+
+    // Pairs each profile with its Keycloak user by id (names come from Keycloak)
+    private List<UserResponse> toResponses(List<UserEntity> userEntities, List<UserRepresentation> userRepresentations) {
+        Map<String, UserRepresentation> repById = userRepresentations.stream()
+                .collect(Collectors.toMap(UserRepresentation::getId, rep -> rep));
+        return userEntities.stream()
+                .map(entity -> userMapper.toResponse(entity, repById.get(entity.getId())))
+                .toList();
+    }
+
+    // END OF HELPS METHODS
 }
