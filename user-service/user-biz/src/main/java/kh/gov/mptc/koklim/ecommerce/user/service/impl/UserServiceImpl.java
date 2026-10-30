@@ -98,26 +98,20 @@ public class UserServiceImpl implements UserService {
             new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found")
         );
 
-        userMapper.toEntity(userUpdateRequest, userEntity);
-        userRepository.save(userEntity);
+        UserRepresentation userRepresentation = keycloakUserService.getKeycloakUserById(id);
 
-        //validate keycloak user exists
-        UserRepresentation userRepresentation = keycloakUserService.getKeycloakUserByUsername(userEntity.getUsername());
-
-        // attpempt to update keycloak user
         if (userUpdateRequest.familyName() != null || userUpdateRequest.givenName() != null) {
-            if (userUpdateRequest.familyName() != null ) {
-                userRepresentation.setFirstName(userUpdateRequest.familyName());
+            if (userUpdateRequest.familyName() != null) {
+                userRepresentation.setLastName(userUpdateRequest.familyName());
             }
-
-            if (userUpdateRequest.givenName() != null ) {
-                userRepresentation.setLastName(userUpdateRequest.givenName());
+            if (userUpdateRequest.givenName() != null) {
+                userRepresentation.setFirstName(userUpdateRequest.givenName());
             }
+            keycloakUserService.updateKeycloakUser(id, userRepresentation);
         }
 
-
-
-//        keycloakUserService.updateKeycloakUser();
+        userMapper.toEntity(userUpdateRequest, userEntity);
+        userRepository.save(userEntity);
 
         return userMapper.toResponse(userEntity, userRepresentation);
     }
