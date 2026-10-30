@@ -55,6 +55,9 @@ public class SecurityConfig {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/actuator/health/**").permitAll()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                        // Swagger UI and each service's API docs (the API calls themselves still need a token)
+                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/webjars/**",
+                                "/v3/api-docs/**", "/*/v3/api-docs").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/orders/**").hasRole("CUSTOMER")
                         .pathMatchers("/api/v1/config/**").hasRole("ADMIN")
                         .anyExchange().authenticated())

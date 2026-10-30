@@ -18,5 +18,10 @@
             <artifactId>user-biz</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Swagger UI: /swagger-ui/index.html, OpenAPI JSON: /v3/api-docs -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
     </dependencies>
 </project>

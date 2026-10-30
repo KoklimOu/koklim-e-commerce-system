@@ -3,6 +3,7 @@ package kh.gov.mptc.koklim.ecommerce.user.service.impl;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
+import kh.gov.mptc.koklim.ecommerce.user.config.KeycloakAdminClientConfig;
 import kh.gov.mptc.koklim.ecommerce.user.exception.KeycloakException;
 import kh.gov.mptc.koklim.ecommerce.user.service.KeycloakUserService;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +61,27 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
         } catch (RuntimeException e) {
             log.error("Could not roll back Keycloak user {}: delete it by hand", keycloakUserId, e);
         }
+    }
+
+    @Override
+    public void updateKeycloakUser(String id, UserRepresentation userRepresentation) {
+        try {
+            keycloak.realm(KeycloakAdminClientConfig.REALM_NAME)
+                    .users()
+                    .get(id)
+                    .update(userRepresentation);
+        }catch (Exception e){
+            log.error("Could not update Keycloak user {}", id, e);
+        }
+    }
+
+    @Override
+    public UserRepresentation getKeycloakUserById(String id) {
+        try {
+            return keycloak.realm(KeycloakAdminClientConfig.REALM_NAME).users().get(id).toRepresentation();
+        } catch (Exception e) {
+            log.error("Could not get Keycloak user {}", id, e);
+        }
+        return null;
     }
 }

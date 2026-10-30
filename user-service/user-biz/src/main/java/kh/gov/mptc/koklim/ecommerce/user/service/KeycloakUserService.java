@@ -16,4 +16,8 @@ public interface KeycloakUserService {
 
     /** Deletes a user from Keycloak. Never throws: used to roll back, so it only logs on failure. */
     void deleteKeycloakUserQuietly(String keycloakUserId);
+
+    void updateKeycloakUser(String id, UserRepresentation userRepresentation);
+
+    UserRepresentation getKeycloakUserById(String id);
 }

@@ -1,15 +1,19 @@
 package kh.gov.mptc.koklim.ecommerce.user.service.impl;
 
+import kh.gov.mptc.koklim.ecommerce.user.config.KeycloakAdminClientConfig;
 import kh.gov.mptc.koklim.ecommerce.user.dto.UserCreateRequest;
 import kh.gov.mptc.koklim.ecommerce.user.dto.UserResponse;
+import kh.gov.mptc.koklim.ecommerce.user.dto.UserUpdateRequest;
 import kh.gov.mptc.koklim.ecommerce.user.entity.UserEntity;
 import kh.gov.mptc.koklim.ecommerce.user.exception.PasswordMismatchException;
+import kh.gov.mptc.koklim.ecommerce.user.exception.UserNotFoundException;
 import kh.gov.mptc.koklim.ecommerce.user.exception.UsernameConflictException;
 import kh.gov.mptc.koklim.ecommerce.user.mapper.UserMapper;
 import kh.gov.mptc.koklim.ecommerce.user.repository.UserRepository;
 import kh.gov.mptc.koklim.ecommerce.user.service.KeycloakRoleService;
 import kh.gov.mptc.koklim.ecommerce.user.service.KeycloakUserService;
 import kh.gov.mptc.koklim.ecommerce.user.service.UserService;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final KeycloakUserService keycloakUserService;
     private final KeycloakRoleService keycloakRoleService;
+    private final Keycloak keycloak;
 
     @Override
     public UserResponse create(UserCreateRequest userCreateRequest) {
@@ -72,6 +77,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
     private UserRepresentation toKeycloakUser(UserCreateRequest userCreateRequest) {
         UserRepresentation userRepresentation = userMapper.toRepresentation(userCreateRequest);
         userRepresentation.setEnabled(true);
@@ -83,5 +89,45 @@ public class UserServiceImpl implements UserService {
         credentialRepresentation.setTemporary(false);
         userRepresentation.setCredentials(List.of(credentialRepresentation));
         return userRepresentation;
+    }
+
+    @Override
+    public UserResponse update(String id, UserUpdateRequest userUpdateRequest) {
+        //valid if user exists
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() ->
+            new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found")
+        );
+
+        userMapper.toEntity(userUpdateRequest, userEntity);
+        userRepository.save(userEntity);
+
+        //validate keycloak user exists
+        UserRepresentation userRepresentation = keycloakUserService.getKeycloakUserByUsername(userEntity.getUsername());
+
+        // attpempt to update keycloak user
+        if (userUpdateRequest.familyName() != null || userUpdateRequest.givenName() != null) {
+            if (userUpdateRequest.familyName() != null ) {
+                userRepresentation.setFirstName(userUpdateRequest.familyName());
+            }
+
+            if (userUpdateRequest.givenName() != null ) {
+                userRepresentation.setLastName(userUpdateRequest.givenName());
+            }
+        }
+
+
+
+//        keycloakUserService.updateKeycloakUser();
+
+        return userMapper.toResponse(userEntity, userRepresentation);
+    }
+
+    @Override
+    public UserResponse getById(String id) {
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() ->
+                new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found")
+        );
+        return userMapper.toResponse(
+                userEntity, keycloakUserService.getKeycloakUserById(id));
     }
 }
